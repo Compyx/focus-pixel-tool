@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<gresources>
+    <gresource prefix="/nl/focus/focus-pixel-tool">
+        <file compressed="true" alias="app-menu.xml">ui/app-menu.xml</file>
+    </gresource>
+</gresources>
+

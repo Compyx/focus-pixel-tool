@@ -1,0 +1,2 @@
+# Make sure we only use LF, not the shitty Windows CR/LF
+* text=lf
