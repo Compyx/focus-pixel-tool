@@ -1,7 +1,7 @@
 /* vim: set et ts=4 sw=4 sts=4 fdm=marker syntax=c.doxygen: */
 
-/** \file   mainwindow.c
- * \brief   Main application window
+/** \file   debug.h
+ * \brief   Debug messages
  *
  * \author  Bas Wassink <b.wassink@ziggo.nl>
  */
@@ -31,25 +31,23 @@
     Public License instead of this License.
 */
 
+#ifndef HAVE_DEBUG_H
+#define HAVE_DEBUG_H
 
-#include <gtk/gtk.h>
+#include <glib.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#include "mainwindow.h"
 
-
-/** \brief  Create main window and hoop up event handlers
- *
- * \param[in,out]   app     GApplication refererence
- *
- * \return  Main Window
+/** \brief  Print debug message
  */
-GtkWidget *mainwindow_create(GtkApplication *app)
-{
-    GtkWidget *window;
+#define fpt_debug(...) \
+    g_print("[debug] %s:%d:%s(): ", __FILE__, __LINE__, __func__); \
+    g_print(__VA_ARGS__); \
+    g_print("\n");
 
-    window = gtk_application_window_new(app);
-    gtk_window_set_default_size(GTK_WINDOW(window), 600, 400);
-    gtk_window_set_title(GTK_WINDOW(window), "Focus Pixel Tool");
+#endif
 
-    return window;
-}
+
+
+

@@ -11,7 +11,11 @@
         <item>
           <attribute name="label">Open</attribute>
           <attribute name="action">app.project_open</attribute>
-       </item>
+        </item>
+        <item>
+          <attribute name="label">About</attribute>
+          <attribute name="action">app.about</attribute>
+        </item>
       </section>
       <section>
         <item>

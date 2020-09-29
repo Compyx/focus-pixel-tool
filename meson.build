@@ -33,7 +33,7 @@ warnings = ['-Wall', '-Wextra', '-Wno-unused-parameter']
 
 # I guess this is autohell's "all"?
 executable('focus-pixel-tool',
-           ['src/main.c', 'src/ui/mainwindow.c'],
+           ['src/main.c', 'src/ui/mainwindow.c', 'src/debug.h'],
            app_resources,
            include_directories : incdirs,
            dependencies : [dep_gtk],

@@ -34,8 +34,140 @@
 
 #include <gtk/gtk.h>
 
+#include "debug.h"
 #include "app-resources.h"
 #include "mainwindow.h"
+
+
+/** \brief  Accelerator data
+ *
+ * Used to pass accelerator data to the accelerator functions.
+ */
+typedef struct accel_s {
+    const gchar *action;    /**< action name, ie 'app.quit' */
+    const gchar *accel;     /**< accelerator, ie '<Primary>Q' */
+} accel_t;
+
+
+
+/** \brief  App reference
+ *
+ * \todo    Do we really need this?
+ */
+GtkApplication *main_app;
+
+
+/** \brief  Main Windows reference
+ *
+ * \todo    Do we really need this?
+ */
+GtkWindow *main_window;
+
+
+/** \brief  List of accelerators used in the app
+ */
+static const accel_t main_accels[] = {
+    { "app.quit",   "<Primary>Q" },
+    { NULL,         NULL }
+};
+
+
+/** \brief  Add accelerators to \a app
+ *
+ */
+static void add_accelerators(GtkApplication *app)
+{
+    for (int i = 0; main_accels[i].action != NULL; i++) {
+        const gchar *temp[2];
+
+        temp[0] = main_accels[i].accel;
+        temp[1] = NULL;
+
+        gtk_application_set_accels_for_action(app,
+                                              main_accels[i].action,
+                                              temp);
+    }
+}
+
+
+/** \brief  Action handler for 'About'
+ *
+ * Opens a dialog/wizard to create a new FPT project.
+ *
+ * \param[in,out]   action      action
+ * \param[in]       paramater   action parameter
+ * \param[in]       data        user data
+ */
+static void on_about(GSimpleAction * action,
+                     GVariant *      parameter,
+                     gpointer        data)
+{
+#if 0
+    g_print("%s:%d:%s(): Called\n", __FILE__, __LINE__, __func__);
+#else
+    fpt_debug("Called!\n");
+#endif
+}
+
+
+
+/** \brief  Action handler for 'open project'
+ *
+ * Opens a dialog/wizard to create a new FPT project
+ *
+ * \param[in,out]   action      action
+ * \param[in]       paramater   action parameter
+ * \param[in]       data        user data
+ */
+static void on_project_open(GSimpleAction * action,
+                            GVariant *      parameter,
+                            gpointer        data)
+{
+    g_print("%s:%d:%s(): Called\n", __FILE__, __LINE__, __func__);
+}
+
+
+/** \brief  Action handler for 'Quit'
+ *
+ * Opens a dialog/wizard to create a new FPT project
+ *
+ * \param[in,out]   action      action
+ * \param[in]       paramater   action parameter
+ * \param[in]       data        user data
+ */
+
+static void on_app_quit(GSimpleAction *action,
+                        GVariant *     parameter,
+                        gpointer       data)
+{
+    GtkWindow *window = main_window;
+
+    g_print("%s:%d:%s(): Called\n", __FILE__, __LINE__, __func__);
+
+    gtk_widget_destroy(GTK_WIDGET(window));
+}
+
+
+/** \brief  Mapping of menu actions to GSimpleActions
+ *
+ * This might get large, so perhaps later move this into its own file or so.
+ */
+static GActionEntry app_actions[] = {
+    {
+        .name = "project_open",
+        .activate = on_project_open
+    },
+    {
+        .name = "about",
+        .activate = on_about
+    },
+    {
+        .name = "quit",
+        .activate = on_app_quit
+    }
+};
+
+
 
 
 /** \brief  Handler for the 'activate' event of the main application
@@ -46,16 +178,29 @@
 static void on_app_activate(GtkApplication *app,
                             gpointer        data)
 {
-    GtkWidget *window;
     GtkBuilder *builder = gtk_builder_new_from_resource(
             "/nl/focus/focus-pixel-tool/app-menu.xml");
     GMenuModel *app_menu = G_MENU_MODEL(gtk_builder_get_object(builder,
                                                                "app-menu"));
-    gtk_application_set_app_menu(app, app_menu);
+    GtkWidget *window;
+
+    gtk_application_set_menubar(app, app_menu);
     g_object_unref(builder);
 
     window = mainwindow_create(app);
+    /* add actions */
+    g_action_map_add_action_entries(
+            G_ACTION_MAP(app),
+            app_actions,
+            G_N_ELEMENTS(app_actions),
+            window);
+
+    /* add accelerators */
+    add_accelerators(app);
+
+
     gtk_widget_show_all(window);
+    main_window = GTK_WINDOW(window);
 }
 
 
@@ -75,7 +220,7 @@ int main(int argc, char *argv[])
             "nl.focus.pixeltool",
             G_APPLICATION_FLAGS_NONE);
     g_signal_connect(app, "activate", G_CALLBACK(on_app_activate), NULL);
-
+    main_app = app;
 
     app_register_resource();
     char **items = g_resources_enumerate_children("/nl/focus/focus-pixel-tool", 0, NULL);
