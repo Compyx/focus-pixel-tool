@@ -44,9 +44,15 @@
  * \param[in]   data    extra event data (unused)
  */
 static void on_app_activate(GtkApplication *app,
-                        gpointer        data)
+                            gpointer        data)
 {
     GtkWidget *window;
+    GtkBuilder *builder = gtk_builder_new_from_resource(
+            "/nl/focus/focus-pixel-tool/app-menu.xml");
+    GMenuModel *app_menu = G_MENU_MODEL(gtk_builder_get_object(builder,
+                                                               "app-menu"));
+    gtk_application_set_app_menu(app, app_menu);
+    g_object_unref(builder);
 
     window = mainwindow_create(app);
     gtk_widget_show_all(window);

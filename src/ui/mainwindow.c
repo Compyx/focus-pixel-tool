@@ -37,21 +37,68 @@
 #include "mainwindow.h"
 
 
+GtkApplication *main_app;
+GtkWindow *main_window;
 
-static void on_project_open(GSimpleAction *action,
-                            GVariant *parameter,
-                            gpointer data)
+
+typedef struct accel_s {
+    const gchar *action;
+    const gchar *accel;
+} accel_t;
+
+
+static accel_t main_accels[] = {
+    { "app.quit",   "<Control>Q" },
+    { NULL,         NULL }
+};
+
+
+
+static void add_accelerators(GtkApplication *app)
+{
+    for (int i = 0; main_accels[i].action != NULL; i++) {
+        const gchar *temp[2];
+
+        temp[0] = main_accels[i].accel;
+        temp[1] = NULL;
+
+        gtk_application_set_accels_for_action(app,
+                                              main_accels[i].action,
+                                              temp);
+    }
+}
+
+
+
+static void on_project_open(GSimpleAction * action,
+                            GVariant *      parameter,
+                            gpointer        data)
 {
     g_print("%s:%d:%s(): Called\n", __FILE__, __LINE__, __func__);
 }
 
 
+static void on_app_quit(GSimpleAction *action,
+                        GVariant *     parameter,
+                        gpointer       data)
+{
+    GtkWindow *window = main_window;
+
+    g_print("%s:%d:%s(): Called\n", __FILE__, __LINE__, __func__);
+
+    gtk_widget_destroy(GTK_WIDGET(window));
+}
+
 
 static GActionEntry app_actions[] = {
     {
         .name = "project_open",
-        .activate = on_project_open,
+        .activate = on_project_open
     },
+    {
+        .name = "quit",
+        .activate = on_app_quit
+    }
 };
 
 
@@ -66,18 +113,12 @@ static GActionEntry app_actions[] = {
 GtkWidget *mainwindow_create(GtkApplication *app)
 {
     GtkWidget *window;
-    GtkBuilder *builder = gtk_builder_new_from_resource(
-            "/nl/focus/focus-pixel-tool/app-menu.xml");
-    GMenuModel *menubar = G_MENU_MODEL(gtk_builder_get_object(builder,
-                                                              "menubar"));
+    main_app = app;
 
     window = gtk_application_window_new(app);
     gtk_window_set_default_size(GTK_WINDOW(window), 600, 400);
     gtk_window_set_title(GTK_WINDOW(window), "Focus Pixel Tool");
-
-
-    gtk_application_set_menubar(app, menubar);
-    g_object_unref(builder);
+    main_window = GTK_WINDOW(window);
 
     /* add actions */
     g_action_map_add_action_entries(
@@ -86,7 +127,8 @@ GtkWidget *mainwindow_create(GtkApplication *app)
             G_N_ELEMENTS(app_actions),
             window);
 
-
+    /* add accelerators */
+    add_accelerators(app);
 
     return window;
 }

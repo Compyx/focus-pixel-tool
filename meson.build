@@ -29,7 +29,7 @@ app_resources = gnome.compile_resources(
 # Set include dirs
 incdirs = include_directories('.', 'src', 'src/ui')
 
-warnings = ['-Wall', '-Wextra']
+warnings = ['-Wall', '-Wextra', '-Wno-unused-parameter']
 
 # I guess this is autohell's "all"?
 executable('focus-pixel-tool',
