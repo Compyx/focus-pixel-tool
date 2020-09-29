@@ -37,6 +37,7 @@
 #include "debug.h"
 #include "app-resources.h"
 #include "mainwindow.h"
+#include "about.h"
 
 
 /** \brief  Accelerator data
@@ -105,7 +106,15 @@ static void on_about(GSimpleAction * action,
 #if 0
     g_print("%s:%d:%s(): Called\n", __FILE__, __LINE__, __func__);
 #else
+
+    GtkWidget *dialog;
+
     fpt_debug("Called!\n");
+    dialog = ui_about_dialog_new();
+    gtk_window_set_transient_for(main_window, GTK_WINDOW(dialog));
+    gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
+    gtk_widget_show(dialog);
+
 #endif
 }
 
@@ -142,8 +151,7 @@ static void on_app_quit(GSimpleAction *action,
 {
     GtkWindow *window = main_window;
 
-    g_print("%s:%d:%s(): Called\n", __FILE__, __LINE__, __func__);
-
+    fpt_debug("Called!");
     gtk_widget_destroy(GTK_WIDGET(window));
 }
 

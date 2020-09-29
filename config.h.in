@@ -1,0 +1,2 @@
+#define FPT_PRG_NAME "@prgname@"
+#define FPT_PRG_VERSION "@prgversion@"
